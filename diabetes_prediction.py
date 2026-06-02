@@ -109,6 +109,10 @@ def main():
             # Replace zeros with median
             df_proc[col] = df_proc[col].replace(0, median_val)
 
+    # Remove SkinThickness column from features (feature deprecated)
+    if 'SkinThickness' in df_proc.columns:
+        df_proc = df_proc.drop(columns=['SkinThickness'])
+
     # Features and target
     X = df_proc.drop(columns=['Outcome'])
     y = df_proc['Outcome']

@@ -24,7 +24,7 @@ You now have **two ways** to run your diabetes prediction platform:
 
 **Option A: One-line (if services already running)**
 ```bash
-streamlit run streamlit_app.py
+streamlit run streamlit_app/streamlit_app.py
 ```
 
 **Option B: Run all services**
@@ -41,7 +41,7 @@ npm run dev
 
 Terminal 3 - Streamlit:
 ```bash
-streamlit run streamlit_app.py
+streamlit run streamlit_app/streamlit_app.py
 ```
 
 Then open: **http://localhost:8501**
@@ -51,10 +51,10 @@ Then open: **http://localhost:8501**
 ## ✨ Streamlit Features
 
 ### 🔮 Risk Prediction
-- Input 8 health parameters
+- Input 7 health parameters
 - Get instant AI prediction
 - View risk level & recommendations
-- Connected to Python ML model
+- Connected to the packaged Python ML model
 
 ### 🤖 AI Health Assistant
 - Chat interface with Google Gemini
@@ -87,12 +87,12 @@ Then open: **http://localhost:8501**
 
 ### Step 1: Install Streamlit
 ```bash
-pip install -r streamlit_requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Step 2: Test Locally
 ```bash
-streamlit run streamlit_app.py
+streamlit run streamlit_app/streamlit_app.py
 ```
 
 ### Step 3: Push to GitHub
@@ -106,7 +106,7 @@ git push origin main
 1. Go to https://share.streamlit.io
 2. Click "New app"
 3. Select your repository
-4. Choose `streamlit_app.py`
+4. Choose `streamlit_app/streamlit_app.py`
 5. Click "Deploy!"
 
 **That's it!** Your app will be live at:
@@ -120,8 +120,9 @@ https://your-username-diabetes-risk-prediction.streamlit.app
 
 ```
 diabetes-risk-prediction-platform/
-├── streamlit_app.py               # 🆕 Main Streamlit app
-├── streamlit_requirements.txt      # 🆕 Python dependencies
+├── streamlit_app/streamlit_app.py  # 🆕 Main Streamlit app
+├── streamlit_app/streamlit_requirements.txt # Local Streamlit dependencies
+├── requirements.txt                # Cloud/runtime dependencies
 ├── STREAMLIT_DEPLOYMENT.md        # 🆕 Detailed deployment guide
 ├── run_streamlit.bat              # 🆕 Quick start script
 ├── .streamlit/
@@ -204,7 +205,7 @@ diabetes-risk-prediction-platform/
 
 1. **Test Streamlit Locally**
    ```bash
-   streamlit run streamlit_app.py
+   streamlit run streamlit_app/streamlit_app.py
    ```
 
 2. **Push to GitHub** (if not already)
@@ -232,7 +233,7 @@ diabetes-risk-prediction-platform/
 ### Streamlit won't start
 ```bash
 pip install streamlit --upgrade
-streamlit run streamlit_app.py
+streamlit run streamlit_app/streamlit_app.py
 ```
 
 ### Backend connection error

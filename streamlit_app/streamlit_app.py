@@ -3,18 +3,25 @@ import requests
 import json
 import os
 import base64
-from datetime import datetime
 import pandas as pd
 from PIL import Image
-import io
 import joblib
 import numpy as np
 
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(APP_DIR)
+
 # Load environment variables
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+load_dotenv(os.path.join(APP_DIR, ".env"))
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
+try:
+    streamlit_secret_key = st.secrets.get("GEMINI_API_KEY", "") or st.secrets.get("GOOGLE_API_KEY", "")
+except Exception:
+    streamlit_secret_key = ""
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "") or streamlit_secret_key
 
 # Page config
 st.set_page_config(
@@ -56,15 +63,71 @@ st.markdown("""
         color: white;
         margin-bottom: 1.5rem;
     }
+
+    .range-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.85rem;
+        margin-top: 0.5rem;
+    }
+
+    .range-card {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 1rem;
+        padding: 1rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.98));
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+    }
+
+    .range-title {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.65rem;
+    }
+
+    .range-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.35rem 0;
+        font-size: 0.84rem;
+        color: #475569;
+    }
+
+    .range-badge {
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .badge-normal { background: linear-gradient(135deg, #16a34a, #22c55e); }
+    .badge-elevated { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .badge-high { background: linear-gradient(135deg, #dc2626, #ef4444); }
     </style>
 """, unsafe_allow_html=True)
 
 # --- Load ML model directly (no Flask dependency for prediction) ---
+def resolve_existing_path(*candidates):
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return candidates[0]
+
+
 @st.cache_resource
 def load_model():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(script_dir, "model.pkl")
-    scaler_path = os.path.join(script_dir, "scaler.pkl")
+    model_path = resolve_existing_path(
+        os.path.join(PROJECT_ROOT, "model.pkl"),
+        os.path.join(APP_DIR, "model.pkl"),
+    )
+    scaler_path = resolve_existing_path(
+        os.path.join(PROJECT_ROOT, "scaler.pkl"),
+        os.path.join(APP_DIR, "scaler.pkl"),
+    )
     
     if not os.path.exists(model_path) or not os.path.exists(scaler_path):
         return None, None
@@ -159,8 +222,6 @@ if page == "🔮 Risk Prediction":
                                    help="Plasma glucose concentration from a 2-hour oral glucose tolerance test")
         blood_pressure = st.number_input("💓 Blood Pressure (mmHg)", min_value=0, max_value=200, value=70,
                                           help="Diastolic blood pressure. Normal is around 80 mmHg")
-        skin_thickness = st.number_input("📏 Skin Thickness (mm)", min_value=0, max_value=100, value=20,
-                                          help="Triceps skin fold thickness, used to estimate body fat")
         insulin = st.number_input("💉 Insulin (mU/ml)", min_value=0, max_value=900, value=80,
                                    help="2-Hour serum insulin level")
     
@@ -173,12 +234,72 @@ if page == "🔮 Risk Prediction":
                                help="Risk typically increases with age")
     
     st.markdown("")
+    # Reference ranges for user guidance
+    with st.expander("📚 Reference Ranges (what's normal / elevated / high)", expanded=False):
+        range_cards = [
+            {
+                "title": "Glucose (mg/dL)",
+                "normal": "< 140",
+                "elevated": "140 - 199",
+                "high": ">= 200",
+                "note": "2-hour OGTT: Normal / Prediabetes / Diabetes",
+            },
+            {
+                "title": "Blood Pressure (mmHg)",
+                "normal": "60 - 80",
+                "elevated": "81 - 90",
+                "high": "> 90",
+                "note": "Diastolic guide (approx).",
+            },
+            {
+                "title": "Insulin (mU/ml)",
+                "normal": "~ 2 - 25",
+                "elevated": "25 - 200",
+                "high": ">= 200",
+                "note": "2-hour serum insulin (general guide).",
+            },
+            {
+                "title": "BMI (kg/m²)",
+                "normal": "18.5 - 24.9",
+                "elevated": "25 - 29.9",
+                "high": ">= 30",
+                "note": "Standard BMI categories.",
+            },
+            {
+                "title": "Diabetes Pedigree",
+                "normal": "< 0.5",
+                "elevated": "0.5 - 1.0",
+                "high": "> 1.0",
+                "note": "Relative genetic risk indicator.",
+            },
+            {
+                "title": "Age (years)",
+                "normal": "< 45",
+                "elevated": "45 - 60",
+                "high": "> 60",
+                "note": "Risk generally increases with age.",
+            },
+        ]
+
+        cards_html = ["<div class='range-grid'>"]
+        for item in range_cards:
+            cards_html.append(f"""
+                <div class='range-card'>
+                    <div class='range-title'>{item['title']}</div>
+                    <div class='range-row'><span>Normal</span><span class='range-badge badge-normal'>{item['normal']}</span></div>
+                    <div class='range-row'><span>Elevated</span><span class='range-badge badge-elevated'>{item['elevated']}</span></div>
+                    <div class='range-row'><span>High</span><span class='range-badge badge-high'>{item['high']}</span></div>
+                    <div style='margin-top:0.65rem; font-size:0.78rem; color:#64748b; line-height:1.4;'>{item['note']}</div>
+                </div>
+            """)
+        cards_html.append("</div>")
+        st.markdown("".join(cards_html), unsafe_allow_html=True)
     
     if st.button("🔬 Run Diagnostic Analysis", key="predict_btn", use_container_width=True, type="primary"):
         with st.spinner("🧠 Analyzing clinical data with ML model..."):
             try:
                 # Prepare features (Pregnancies=0, hidden from UI)
-                features = np.array([[0, glucose, blood_pressure, skin_thickness, 
+                features = np.array([[0, glucose, blood_pressure, 
                                       insulin, bmi, diabetes_pedigree, age]])
                 features_scaled = scaler.transform(features)
                 

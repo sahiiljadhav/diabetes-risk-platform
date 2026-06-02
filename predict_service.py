@@ -44,7 +44,6 @@ FEATURE_ORDER = [
     "Pregnancies",
     "Glucose",
     "BloodPressure",
-    "SkinThickness",
     "Insulin",
     "BMI",
     "DiabetesPedigreeFunction",
@@ -64,7 +63,7 @@ def health():
 def predict():
     """
     Main prediction endpoint.
-    Expects JSON with the 8 required features.
+    Expects JSON with the 7 required features.
     Returns prediction, probability, and risk level.
     """
     try:

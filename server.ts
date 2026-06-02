@@ -33,7 +33,6 @@ type PredictionInput = {
   Pregnancies: number;
   Glucose: number;
   BloodPressure: number;
-  SkinThickness: number;
   Insulin: number;
   BMI: number;
   DiabetesPedigreeFunction: number;
@@ -54,7 +53,6 @@ const FEATURE_LABELS: Record<keyof PredictionInput, string> = {
   Pregnancies: "Pregnancies",
   Glucose: "Glucose",
   BloodPressure: "BP",
-  SkinThickness: "Skin Thickness",
   Insulin: "Insulin",
   BMI: "BMI",
   DiabetesPedigreeFunction: "Pedigree",
@@ -466,7 +464,6 @@ async function startServer() {
         "Pregnancies",
         "Glucose",
         "BloodPressure",
-        "SkinThickness",
         "Insulin",
         "BMI",
         "DiabetesPedigreeFunction",

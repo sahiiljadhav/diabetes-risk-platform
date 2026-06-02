@@ -21,7 +21,6 @@ interface PredictionFormData {
   Pregnancies: number;
   Glucose: number;
   BloodPressure: number;
-  SkinThickness: number;
   Insulin: number;
   BMI: number;
   DiabetesPedigreeFunction: number;
@@ -57,7 +56,6 @@ const Prediction: React.FC = () => {
       Pregnancies: 0,
       Glucose: 100,
       BloodPressure: 70,
-      SkinThickness: 20,
       Insulin: 80,
       BMI: 25,
       DiabetesPedigreeFunction: 0.47,
@@ -65,7 +63,7 @@ const Prediction: React.FC = () => {
     }
   });
 
-  // Pregnancies is always sent as 0 to the ML model (needs 8 features) but hidden from UI
+  // Pregnancies is always sent as 0 to the ML model (model expects 7 features) but hidden from UI
 
   const onSubmit = async (data: PredictionFormData) => {
     setIsLoading(true);
@@ -92,11 +90,19 @@ const Prediction: React.FC = () => {
   const inputFields = [
     { id: 'Glucose', label: 'Glucose', type: 'number', min: 0, max: 300, hint: 'Plasma glucose concentration', tooltip: 'A 2-hour oral glucose tolerance test.' },
     { id: 'BloodPressure', label: 'Blood Pressure', type: 'number', min: 0, max: 200, hint: 'Diastolic blood pressure (mm Hg)', tooltip: 'Normal is around 80 mm Hg.' },
-    { id: 'SkinThickness', label: 'Skin Thickness', type: 'number', min: 0, max: 100, hint: 'Triceps skin fold thickness (mm)', tooltip: 'Used to estimate body fat.' },
     { id: 'Insulin', label: 'Insulin', type: 'number', min: 0, max: 900, hint: '2-Hour serum insulin (mu U/ml)', tooltip: 'Measures how well the body processes sugar.' },
     { id: 'BMI', label: 'BMI', type: 'number', step: '0.1', min: 0, max: 70, hint: 'Body mass index (weight/height^2)', tooltip: 'Over 30 is considered obese.' },
     { id: 'DiabetesPedigreeFunction', label: 'Pedigree Function', type: 'number', step: '0.001', min: 0, max: 3, hint: 'Diabetes pedigree function', tooltip: 'Genetic influence score based on family history.' },
     { id: 'Age', label: 'Age', type: 'number', min: 18, max: 120, hint: 'Age in years', tooltip: 'Risk typically increases with age.' },
+  ];
+
+  const referenceRanges = [
+    { feature: 'Glucose', normal: '< 140 mg/dL', elevated: '140 - 199', high: '>= 200' },
+    { feature: 'Blood Pressure', normal: '60 - 80 mmHg', elevated: '81 - 90', high: '> 90' },
+    { feature: 'Insulin', normal: '~ 2 - 25 mU/ml', elevated: '25 - 200', high: '>= 200' },
+    { feature: 'BMI', normal: '18.5 - 24.9', elevated: '25 - 29.9', high: '>= 30' },
+    { feature: 'Pedigree Function', normal: '< 0.5', elevated: '0.5 - 1.0', high: '> 1.0' },
+    { feature: 'Age', normal: '< 45', elevated: '45 - 60', high: '> 60' },
   ];
 
   return (
@@ -117,6 +123,16 @@ const Prediction: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-7 xl:col-span-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {referenceRanges.map((r) => (
+                <div key={r.feature} className="rounded-xl border border-gray-100 bg-gradient-to-tr from-white to-gray-50 p-3 text-sm">
+                  <div className="font-bold text-gray-800">{r.feature}</div>
+                  <div className="text-[12px] text-gray-500">Normal: <span className="font-medium text-green-600">{r.normal}</span></div>
+                  <div className="text-[12px] text-gray-500">Elevated: <span className="font-medium text-amber-600">{r.elevated}</span></div>
+                  <div className="text-[12px] text-gray-500">High: <span className="font-medium text-red-600">{r.high}</span></div>
+                </div>
+              ))}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
               {inputFields.map((field) => (
                 <div key={field.id} className="space-y-2">

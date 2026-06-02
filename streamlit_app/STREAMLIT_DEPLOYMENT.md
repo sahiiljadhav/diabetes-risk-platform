@@ -6,8 +6,8 @@ Your DiaRisk AI platform now has a **Streamlit version** that runs alongside you
 
 ### What You Have:
 - **React App** (Port 3000): Current full-featured interface
-- **Streamlit App**: Cloud-friendly alternative interface
-- **Shared Backend**: Both use the same Python ML service (Port 5000)
+- **Streamlit App**: Cloud-friendly standalone interface
+- **ML Model**: Loaded directly by Streamlit from `model.pkl` and `scaler.pkl`
 
 ---
 
@@ -15,25 +15,15 @@ Your DiaRisk AI platform now has a **Streamlit version** that runs alongside you
 
 ### 1. Install Streamlit Dependencies
 ```bash
-pip install -r streamlit_requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 2. Start All Services
-You need three terminal windows:
+You only need Streamlit for the UI. If `model.pkl` and `scaler.pkl` are missing, run `python diabetes_prediction.py` once to generate them.
 
-**Terminal 1 - Python ML Service (Port 5000):**
+**Streamlit App (Port 8501):**
 ```bash
-python diabetes_prediction.py
-```
-
-**Terminal 2 - Node.js Backend (Port 3000):**
-```bash
-npm run dev
-```
-
-**Terminal 3 - Streamlit App (Port 8501):**
-```bash
-streamlit run streamlit_app.py
+streamlit run streamlit_app/streamlit_app.py
 ```
 
 ### 3. Access Local App
@@ -52,30 +42,21 @@ streamlit run streamlit_app.py
 Add requirements file to root (already done):
 ```bash
 # .streamlit/config.toml
-# streamlit_app.py
-# streamlit_requirements.txt
+# streamlit_app/streamlit_app.py
+# requirements.txt
 ```
 
-### Step 2: Update Config for Cloud Deployment
+### Step 2: Confirm Model Files
 
-Since your app connects to backend services, you have two options:
+Make sure these files are committed or generated before deployment:
 
-**Option A: Use Cloud Version (Recommended for Production)**
+- `model.pkl`
+- `scaler.pkl`
 
-Update `streamlit_app.py` to use Hugging Face Spaces or your hosted backend:
-
-```python
-# Replace localhost with your deployed backend URLs
-API_URL = os.getenv("API_URL", "http://localhost:3000")
-ML_URL = os.getenv("ML_URL", "http://localhost:5000")
+If you need to regenerate them, run:
+```bash
+python diabetes_prediction.py
 ```
-
-**Option B: Keep Local Backend (Development)**
-
-The current setup expects services on localhost. This works for:
-- Personal use
-- Team development
-- Testing before full deployment
 
 ### Step 3: Push to GitHub
 
@@ -106,51 +87,14 @@ dist/
 2. Click **"New app"**
 3. Select your GitHub repository
 4. Choose branch: `main`
-5. Set file path: `streamlit_app.py`
+5. Set file path: `streamlit_app/streamlit_app.py`
 6. Click **"Deploy!"**
-
 ### Step 5: Environment Variables (if using cloud backend)
 
 Create `secrets.toml` in `.streamlit/`:
 
 ```toml
-[connections.sql]
-dialect = "sqlite"
-database = "diabetes.db"
-
-api_url = "https://your-backend.com"
-ml_url = "https://your-ml-service.com"
-```
-
----
-
-## 📦 Deploy Backend Services
-
-If you want full cloud deployment:
-
-### Option 1: Deploy Node.js to Heroku/Railway
-
-```bash
-# Create Procfile
-echo "web: npm start" > Procfile
-
-git push heroku main
-```
-
-### Option 2: Deploy Python ML to Hugging Face Spaces
-
-1. Create space at https://huggingface.co/spaces
-2. Select "Docker" runtime
-3. Upload your `diabetes_prediction.py`
-4. Set port to 7860
-
-### Option 3: Use Cloud Databases
-
-Replace SQLite with PostgreSQL for production:
-
-```python
-import psycopg2
-DATABASE_URL = os.getenv("DATABASE_URL")
+GEMINI_API_KEY = "your-gemini-api-key"
 ```
 
 ---
@@ -207,7 +151,7 @@ ModuleNotFoundError: No module named 'streamlit'
 ```
 **Solution**: 
 ```bash
-pip install -r streamlit_requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Too Large Files
