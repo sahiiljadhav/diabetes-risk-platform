@@ -50,6 +50,11 @@ def _inject_local_css():
                     css = f.read()
                 st.markdown(f"<style>\n{css}\n</style>", unsafe_allow_html=True)
                 injected = True
+                # Emit a clear log marker so Streamlit build logs indicate which CSS was used
+                try:
+                    print(f"STREAMLIT_CSS_INJECTED: {p}")
+                except Exception:
+                    pass
         except Exception:
             # ignore and try next
             pass
@@ -77,6 +82,10 @@ def _inject_local_css():
             .badge-high { background: linear-gradient(135deg, #dc2626, #ef4444); }
             </style>
         """, unsafe_allow_html=True)
+        try:
+            print("STREAMLIT_CSS_INJECTED: fallback_inline_css")
+        except Exception:
+            pass
 
 
 _inject_local_css()
