@@ -31,84 +31,55 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    
-    .main { padding-top: 0rem; font-family: 'Inter', sans-serif; }
-    .stTabs [data-baseweb="tab-list"] button { font-weight: 600; }
-    
-    .risk-card {
-        padding: 1.5rem;
-        border-radius: 1rem;
-        text-align: center;
-        border: 1px solid #e5e7eb;
-    }
-    .risk-high { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-color: #fca5a5; }
-    .risk-medium { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fcd34d; }
-    .risk-low { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac; }
-    
-    .nutrition-card {
-        padding: 1rem;
-        border-radius: 0.75rem;
-        text-align: center;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .hero-section {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-        padding: 2rem;
-        border-radius: 1rem;
-        color: white;
-        margin-bottom: 1.5rem;
-    }
+def _inject_local_css():
+    """Inject local CSS files into Streamlit so the app matches the repo design.
 
-    .range-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 0.85rem;
-        margin-top: 0.5rem;
-    }
+    Looks for common frontend CSS (e.g., `src/index.css`) and injects it first,
+    then falls back to the inline CSS defined for Streamlit-specific classes.
+    """
+    css_paths = [
+        os.path.join(PROJECT_ROOT, "src", "index.css"),
+        os.path.join(PROJECT_ROOT, "src", "styles.css"),
+    ]
 
-    .range-card {
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 1rem;
-        padding: 1rem;
-        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.98));
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
-    }
+    injected = False
+    for p in css_paths:
+        try:
+            if os.path.exists(p):
+                with open(p, "r", encoding="utf-8") as f:
+                    css = f.read()
+                st.markdown(f"<style>\n{css}\n</style>", unsafe_allow_html=True)
+                injected = True
+        except Exception:
+            # ignore and try next
+            pass
 
-    .range-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 0.65rem;
-    }
+    # If no local CSS injected, include the existing inline CSS as a fallback
+    if not injected:
+        st.markdown("""
+            <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+            .main { padding-top: 0rem; font-family: 'Inter', sans-serif; }
+            .stTabs [data-baseweb="tab-list"] button { font-weight: 600; }
+            .risk-card { padding: 1.5rem; border-radius: 1rem; text-align: center; border: 1px solid #e5e7eb; }
+            .risk-high { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-color: #fca5a5; }
+            .risk-medium { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fcd34d; }
+            .risk-low { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac; }
+            .nutrition-card { padding: 1rem; border-radius: 0.75rem; text-align: center; border: 1px solid #e5e7eb; }
+            .hero-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); padding: 2rem; border-radius: 1rem; color: white; margin-bottom: 1.5rem; }
+            .range-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin-top: 0.5rem; }
+            .range-card { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 1rem; padding: 1rem; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.98)); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04); }
+            .range-title { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.65rem; }
+            .range-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin: 0.35rem 0; font-size: 0.84rem; color: #475569; }
+            .range-badge { border-radius: 999px; padding: 0.2rem 0.55rem; font-size: 0.72rem; font-weight: 700; color: white; }
+            .badge-normal { background: linear-gradient(135deg, #16a34a, #22c55e); }
+            .badge-elevated { background: linear-gradient(135deg, #d97706, #f59e0b); }
+            .badge-high { background: linear-gradient(135deg, #dc2626, #ef4444); }
+            </style>
+        """, unsafe_allow_html=True)
 
-    .range-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 0.5rem;
-        margin: 0.35rem 0;
-        font-size: 0.84rem;
-        color: #475569;
-    }
 
-    .range-badge {
-        border-radius: 999px;
-        padding: 0.2rem 0.55rem;
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: white;
-    }
-
-    .badge-normal { background: linear-gradient(135deg, #16a34a, #22c55e); }
-    .badge-elevated { background: linear-gradient(135deg, #d97706, #f59e0b); }
-    .badge-high { background: linear-gradient(135deg, #dc2626, #ef4444); }
-    </style>
-""", unsafe_allow_html=True)
+_inject_local_css()
 
 # --- Load ML model directly (no Flask dependency for prediction) ---
 def resolve_existing_path(*candidates):
