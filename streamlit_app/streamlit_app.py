@@ -174,6 +174,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Visible CSS source banner for debugging (shows on the page)
+try:
+    if 'CSS_SOURCE' in globals() and CSS_SOURCE:
+        st.info(f"CSS loaded: {CSS_SOURCE}")
+except Exception:
+    pass
+
 # Sidebar
 with st.sidebar:
     st.markdown("### 🧭 Navigation")
