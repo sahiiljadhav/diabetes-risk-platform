@@ -38,7 +38,6 @@ def _inject_local_css():
     then falls back to the inline CSS defined for Streamlit-specific classes.
     """
     css_paths = [
-        os.path.join(PROJECT_ROOT, "src", "index.css"),
         os.path.join(PROJECT_ROOT, "src", "styles.css"),
     ]
 
