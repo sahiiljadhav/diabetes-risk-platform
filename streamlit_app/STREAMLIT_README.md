@@ -24,7 +24,7 @@ You now have **two ways** to run your diabetes prediction platform:
 
 **Option A: One-line (if services already running)**
 ```bash
-streamlit run streamlit_app/streamlit_app.py
+streamlit run streamlit_app.py
 ```
 
 **Option B: Run all services**
@@ -41,7 +41,7 @@ npm run dev
 
 Terminal 3 - Streamlit:
 ```bash
-streamlit run streamlit_app/streamlit_app.py
+streamlit run streamlit_app.py
 ```
 
 Then open: **http://localhost:8501**
@@ -92,7 +92,7 @@ pip install -r requirements.txt
 
 ### Step 2: Test Locally
 ```bash
-streamlit run streamlit_app/streamlit_app.py
+streamlit run streamlit_app.py
 ```
 
 ### Step 3: Push to GitHub
@@ -106,7 +106,7 @@ git push origin main
 1. Go to https://share.streamlit.io
 2. Click "New app"
 3. Select your repository
-4. Choose `streamlit_app/streamlit_app.py`
+4. Choose `streamlit_app.py`
 5. Click "Deploy!"
 
 **That's it!** Your app will be live at:

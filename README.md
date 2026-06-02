@@ -61,6 +61,26 @@ Identify food items and get nutritional information instantly using advanced com
 *For advanced configuration, see the archived documentation in the `/archive` folder.*
 
 ---
+
+## ☁️ Cloud Deployment
+
+### Streamlit Cloud
+
+This repo includes a root Streamlit launcher at [streamlit_app.py](streamlit_app.py) so Cloud deploys can point to the repository root.
+
+1. Push the repo to GitHub.
+2. Open Streamlit Cloud and create a new app.
+3. Select this repository and set the main file to [streamlit_app.py](streamlit_app.py).
+4. Add `GEMINI_API_KEY` in Streamlit secrets.
+5. Deploy.
+
+### Local Streamlit Run
+
+```bash
+streamlit run streamlit_app.py
+```
+
+---
 > [!NOTE]
 > **Service Availability**: AI features (Assistant and Food Scanner) utilize the Gemini API and may occasionally fluctuate or hit quota limits during periods of high demand.
 

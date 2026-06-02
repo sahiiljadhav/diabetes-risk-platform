@@ -23,7 +23,7 @@ You only need Streamlit for the UI. If `model.pkl` and `scaler.pkl` are missing,
 
 **Streamlit App (Port 8501):**
 ```bash
-streamlit run streamlit_app/streamlit_app.py
+streamlit run streamlit_app.py
 ```
 
 ### 3. Access Local App
@@ -42,7 +42,7 @@ streamlit run streamlit_app/streamlit_app.py
 Add requirements file to root (already done):
 ```bash
 # .streamlit/config.toml
-# streamlit_app/streamlit_app.py
+# streamlit_app.py
 # requirements.txt
 ```
 
@@ -87,7 +87,7 @@ dist/
 2. Click **"New app"**
 3. Select your GitHub repository
 4. Choose branch: `main`
-5. Set file path: `streamlit_app/streamlit_app.py`
+5. Set file path: `streamlit_app.py`
 6. Click **"Deploy!"**
 ### Step 5: Environment Variables (if using cloud backend)
 
