@@ -52,11 +52,7 @@ def _inject_local_css():
                 st.markdown(f"<style>\n{css}\n</style>", unsafe_allow_html=True)
                 injected = True
                 css_used = p
-                # Emit a clear log marker so Streamlit build logs indicate which CSS was used
-                try:
-                    print(f"STREAMLIT_CSS_INJECTED: {p}")
-                except Exception:
-                    pass
+                # local CSS injected (silent)
         except Exception:
             # ignore and try next
             pass
@@ -84,24 +80,13 @@ def _inject_local_css():
             .badge-high { background: linear-gradient(135deg, #dc2626, #ef4444); }
             </style>
         """, unsafe_allow_html=True)
-        try:
-            print("STREAMLIT_CSS_INJECTED: fallback_inline_css")
-        except Exception:
-            pass
+        # fallback inline CSS used (silent)
         css_used = "fallback_inline_css"
 
     return css_used
 
 
 CSS_SOURCE = _inject_local_css()
-
-# Expose which CSS was used in the sidebar for easy verification in the UI
-try:
-    if CSS_SOURCE:
-        with st.sidebar:
-            st.caption(f"CSS loaded: {CSS_SOURCE}")
-except Exception:
-    pass
 
 # --- Load ML model directly (no Flask dependency for prediction) ---
 def resolve_existing_path(*candidates):
