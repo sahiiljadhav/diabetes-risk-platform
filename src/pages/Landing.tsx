@@ -261,7 +261,7 @@ const Landing = () => {
 
           </div>
           <div className="pt-8 border-t border-slate-700 text-xs">
-            <p>© 2026 DiaRisk AI. For educational and informational purposes only.</p>
+            <p>© 2026 DiaRisk AI. Copyright Atharva kene, Atharva Wankhade, Pratham baniya, Krishna Jaiswal. For educational and informational purposes only.</p>
           </div>
         </div>
       </footer>
